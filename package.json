@@ -1,0 +1,19 @@
+{
+  "name": "airbean-exam",
+  "version": "1.0.0",
+  "description": "Node.js Exam -- Fabulous Dolphins",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.18.2",
+    "nedb-promise": "^2.0.1",
+    "nodemon": "^2.0.22"
+  }
+}
