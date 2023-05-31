@@ -1,8 +1,22 @@
 const express = require("express");
 const { getProducts } = require("./database/products");
-const { getUsers, addUser, checkUser, findUser, authenticate, updateUserHistory, isLoggedIn, getHistory } = require("./database/users");
+const {
+  getUsers,
+  addUser,
+  checkUser,
+  findUser,
+  authenticate,
+  updateUserHistory,
+  isLoggedIn,
+  getHistory,
+} = require("./database/users");
 const { hashPW } = require("./bcrypt");
-const { checkOrders, saveOrders, getOrder } = require("./database/order");
+const {
+  checkOrders,
+  saveOrders,
+  getOrder,
+  checkOrderNr,
+} = require("./database/order");
 const app = express();
 app.use(express.json());
 const PORT = 9090;
@@ -29,67 +43,81 @@ app.get("/api/users", async (req, res) => {
 
 // login with a check if user and password exist
 app.post("/api/login", findUser, authenticate, async (req, res) => {
-    try {
-        res.send({ success: true })
-    } catch (error) {
-        res.send({ message: 'Something went wrong'})
-    }
+  try {
+    res.send({ success: true });
+  } catch (error) {
+    res.send({ message: "Something went wrong" });
+  }
 });
 
 // signup with a check if user check
-app.post("/api/signup",checkUser, async (req, res) => {
+app.post("/api/signup", checkUser, async (req, res) => {
   const { username, password } = req.body;
   const hashedPW = await hashPW(password);
   addUser(username, hashedPW);
   res.json({ success: true, message: "User was added" });
 });
 
-// check if orders are correct, and add it to a logged in user
-app.post('/api/order', checkOrders, async (req, res) => {
-    const orders = req.body.orders;
-    const username = req.body.username;
-    const date = new Date().toLocaleString();
-    const loggedIn = await isLoggedIn(username);
-    const orderNr = Math.floor(Math.random() * 1000)
-    const orderStatus = false
+// check if orders are correct, and add it to a logged in user.
+// The order will also be addded to the order database
+app.post("/api/order", checkOrders, async (req, res) => {
+  const order = req.body.order;
+  const username = req.body.username;
 
-    if(loggedIn) {
-        updateUserHistory(username, orders, date, orderNr, orderStatus);
-        //Add date
-        res.send({success: true, message: "Your order has been made", order: orders })
-    } else {
-        res.send({ message: 'Your order has been made', order: orders})
-    }
-    saveOrders(orders, date, orderNr, orderStatus);
-})
+  let totalPrice = 0;
+  order.forEach((item) => {
+    totalPrice = totalPrice + item.price;
+  });
 
-app.get('/api/user/history', async (req, res) => {
-    const { username } = req.body;
-    const userHistory = await getHistory(username);
-    res.send(userHistory)
-})
+  // Funktion för tid
+  const date = new Date();
+  const ETA = new Date(date.getTime());
+  ETA.setMinutes(ETA.getMinutes() + 20);
 
-app.get('/api/status/:orderNr', async (req, res) => {
-    const orderNr = req.params.orderNr
-    //baserat på order nr hitta order
-    const order = await getOrder(orderNr);
-    console.log(order);
+  const loggedIn = await isLoggedIn(username);
+  const orderNr = Math.floor(Math.random() * 1000);
+  const orderStatus = false;
 
-    function isDelivered(date1, date2) {
-        const ms = Math.abs(Date.parse(date1) - Date.parse(date2));
-        const minutes = Math.floor(ms / 60000);
-        return minutes >= 20;
-    }
+  if (loggedIn) {
+    updateUserHistory(username, order, date, ETA, orderNr, totalPrice);
+  }
+  saveOrders(order, date, ETA, orderNr, orderStatus, totalPrice);
+  res.send({
+    success: true,
+    message: "Your order is on its way",
+    ETA: ETA,
+    orderNr: orderNr,
+    totalPrice: totalPrice,
+    order: order,
+  });
+});
 
-    function getOrderStatus() {
-        const time = order.date;
-        console.log(time);
-      
-        const now = new Date();
-        const isAtLeast20Minutes = isDelivered(time, now);
-      
-        return isAtLeast20Minutes;
-    } 
-})
+app.get("/api/user/history", findUser, async (req, res) => {
+  const { username } = req.body;
+  const userHistory = await getHistory(username);
+  res.send({
+    success: true,
+    orderHisstory: userHistory,
+  });
+});
+
+app.get("/api/status/:orderNr", checkOrderNr, async (req, res) => {
+  const orderNr = parseInt(req.params.orderNr, 10);
+  const order = await getOrder(orderNr);
+  const status = order.order.status;
+  const ETA = order.order.ETA;
+
+  if (status) {
+    res.send({
+      message: "Your order has been delivered",
+      ETA: ETA,
+    });
+  } else {
+    res.send({
+      message: "Your order is on it's way",
+      ETA: ETA,
+    });
+  }
+});
 
 app.listen(PORT, () => console.log("LIVE"));

@@ -25,7 +25,7 @@ async function authenticate(req, res, next) {
   const user = await usersDB.findOne({ username: username });
   const pwExist = await comparePW(password, user.password);
   if (pwExist) {
-    usersDB.update({ username: username}, { $push: { isLoggedIn: true }});
+    usersDB.update({ username: username }, { $push: { isLoggedIn: true } });
     next();
   } else {
     res.send({ message: "Incorrect password" });
@@ -43,30 +43,40 @@ async function checkUser(req, res, next) {
 }
 
 async function isLoggedIn(username) {
-    const user = await usersDB.findOne({ username: username });
-    if (user.isLoggedIn) {
-        return true;
-    } else {
-        return false;
-    }
+  const user = await usersDB.findOne({ username: username });
+  if (user.isLoggedIn) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-async function updateUserHistory(username, order, date, orderNr, orderStatus) {
-    orderObj = {
-        items: order,
-        date: date,
-        orderNr: orderNr,
-        status: orderStatus
-    }
-    usersDB.update({ username: username }, { $push: { orders: { order: orderObj }}});
+async function updateUserHistory(
+  username,
+  order,
+  date,
+  ETA,
+  orderNr,
+  totalPrice
+) {
+  orderObj = {
+    orderNr: orderNr,
+    totalPrice: totalPrice,
+    date: date,
+    ETA: ETA,
+    items: order,
+  };
+  usersDB.update(
+    { username: username },
+    { $push: { orders: { order: orderObj } } }
+  );
 }
 
 async function getHistory(username) {
-    const user = await usersDB.findOne({ username: username});
-    const orderHistory = user.orders;
-    return orderHistory;
+  const user = await usersDB.findOne({ username: username });
+  const orderHistory = user.orders;
+  return orderHistory;
 }
-
 
 module.exports = {
   getUsers,
@@ -76,5 +86,5 @@ module.exports = {
   authenticate,
   isLoggedIn,
   updateUserHistory,
-  getHistory
+  getHistory,
 };
