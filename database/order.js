@@ -35,7 +35,7 @@ async function checkOrders(req, res, next) {
       !product ||
       (product.product.price !== price && product.product.title !== title)
     ) {
-      res.send("Price or title is wrong");
+      res.send({ success: false, message: "Price or title is wrong" });
     } else {
       orderList.push(order);
     }
@@ -44,11 +44,14 @@ async function checkOrders(req, res, next) {
   if (orderList.length === order.length) {
     next();
   } else {
-    res.send("something went wrong");
+    res.send({
+      success: false,
+      message: "Something went wrong with your order",
+    });
   }
 }
 
-async function saveOrders(order, date, ETA, orderNr, orderStatus, totalPrice) {
+function saveOrders(order, date, ETA, orderNr, orderStatus, totalPrice) {
   orderObj = {
     orderNr: orderNr,
     status: orderStatus,
@@ -67,7 +70,10 @@ async function checkOrderNr(req, res, next) {
   const order = orders.find((order) => order.order.orderNr === orderNr);
 
   if (order === undefined) {
-    res.send("No order was found with that order number");
+    res.send({
+      success: false,
+      message: "No order was found with that order number",
+    });
   } else {
     next();
   }
