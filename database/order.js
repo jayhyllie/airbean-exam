@@ -10,10 +10,15 @@ async function updateOrderStatus(orderNr) {
   const ETAdate = new Date(formattedETA);
   const currentDate = new Date();
   const isDelivered = ETAdate < currentDate;
-
+  let status = "";
+  if(isDelivered) {
+    status = "Done"
+  } else {
+    status = "Not done"
+  }
   ordersDB.update(
     { "order.orderNr": orderNr },
-    { $set: { "order.status": isDelivered } }
+    { $set: { "order.status": status } }
   );
 }
 
@@ -31,11 +36,8 @@ async function checkOrders(req, res, next) {
     const price = order.price;
     const title = order.title;
     const product = products.find((product) => product._id === id);
-    if (
-      !product ||
-      (product.product.price !== price && product.product.title !== title)
-    ) {
-      res.send({ success: false, message: "Price or title is wrong" });
+    if (!product || product.product.price !== price || product.product.title !== title) {
+      res.status(400).send({ success: false, message: "Product not found" });
     } else {
       orderList.push(order);
     }
@@ -43,11 +45,6 @@ async function checkOrders(req, res, next) {
 
   if (orderList.length === order.length) {
     next();
-  } else {
-    res.send({
-      success: false,
-      message: "Something went wrong with your order",
-    });
   }
 }
 
@@ -65,12 +62,10 @@ function saveOrders(order, date, ETA, orderNr, orderStatus, totalPrice) {
 
 async function checkOrderNr(req, res, next) {
   const orderNr = parseInt(req.params.orderNr, 10);
-
   const orders = await ordersDB.find({});
   const order = orders.find((order) => order.order.orderNr === orderNr);
-
-  if (order === undefined) {
-    res.send({
+  if (!order) {
+    res.status(404).send({
       success: false,
       message: "No order was found with that order number",
     });
