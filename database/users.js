@@ -61,12 +61,13 @@ async function isLoggedIn(username) {
   }
 }
 
-function updateOrderHistory(username, order, date, ETA, orderNr, totalPrice) {
+function updateOrderHistory(username, order, date, ETA, orderNr, orderStatus, totalPrice) {
   orderObj = {
     orderNr: orderNr,
     totalPrice: totalPrice,
     date: date,
     ETA: ETA,
+    status: orderStatus,
     items: order,
   };
   usersDB.update(
@@ -78,8 +79,26 @@ function updateOrderHistory(username, order, date, ETA, orderNr, totalPrice) {
 async function getHistory(userId) {
   const user = await usersDB.findOne({ _id: userId });
   const orderHistory = user.orders;
+
+  orderHistory.forEach(order=> {
+    console.log(order);
+    const ETA = order.order.ETA
+    //const formattedETA = ETA.replace(",", " ");
+    //const ETAdate = new Date(formattedETA);
+    //const currentDate = new Date();
+    //const isDelivered = ETAdate < currentDate;
+    const orderNr = order.order.orderNr
+  
+    //console.log(isDelivered);
+
+    //usersDB.update({"order.orderNr": orderNr}, {$set: {"order.status": isDelivered}})
+  });
+
   return orderHistory;
 }
+
+
+getHistory("BQFIpRHIbTK7fM6x")
 
 module.exports = {
   addUser,

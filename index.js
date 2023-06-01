@@ -88,7 +88,7 @@ app.post("/api/order", checkOrders, async (req, res) => {
     const orderStatus = false;
 
     if (loggedIn) {
-      updateOrderHistory(username, order, date, ETA, orderNr, totalPrice);
+      updateOrderHistory(username, order, date, ETA, orderNr, orderStatus, totalPrice);
     }
     saveOrders(order, date, ETA, orderNr, orderStatus, totalPrice);
     res.send({
