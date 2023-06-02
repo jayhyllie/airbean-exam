@@ -15,17 +15,11 @@ async function updateOrderStatus(orderNr) {
   const currentDate = new Date();
   // Checks if ETA has passed.
   const isDelivered = ETAdate < currentDate;
-  let status = "";
 
-  if (isDelivered) {
-    status = "Delivered";
-  } else {
-    status = "Not delivered";
-  }
   // The order status is then updated in the order database.
   ordersDB.update(
     { "order.orderNr": orderNr },
-    { $set: { "order.status": status } }
+    { $set: { "order.status": isDelivered } }
   );
 }
 

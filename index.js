@@ -118,10 +118,10 @@ app.get("/api/order/status/:orderNr", checkOrderNr, async (req, res) => {
 
   //When getting the order the order status will also be updated.
   const order = await getOrder(orderNr);
-  const status = order.order.status;
+  const orderStatus = order.order.status;
   const ETA = order.order.ETA;
 
-  if (status) {
+  if (orderStatus) {
     res.send({
       message: "Your order has been delivered",
       ETA: ETA,

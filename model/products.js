@@ -12,8 +12,8 @@ function importProducts() {
     productsDB.insert({ product: product });
   });
 }
-
-/* importProducts(); */ // Calling the function one time to fill the products database.
+// Calling the function one time to fill the products database.
+//importProducts();
 
 // Function to get all products from the products database.
 async function getProducts() {

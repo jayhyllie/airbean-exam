@@ -37,10 +37,13 @@ async function findUser(req, res, next) {
 async function authenticate(req, res, next) {
   const { username, password } = req.body;
   const user = await usersDB.findOne({ username: username });
+  const loggedIn = user.isLoggedIn;
   const pwExist = await comparePW(password, user.password);
-  if (pwExist) {
-    usersDB.update({ username: username }, { $push: { isLoggedIn: true } });
+  if (pwExist && !loggedIn) {
+    usersDB.update({ username: username }, { $set: { isLoggedIn: true } });
     next();
+  } else if (pwExist && loggedIn) {
+    res.send({ message: "You are already logged in" });
   } else {
     res.status(401).send({ message: "Incorrect password" });
   }
@@ -64,8 +67,8 @@ function updateOrderHistory(username, order, date, ETA, orderNr, totalPrice) {
   orderObj = {
     orderNr: orderNr,
     totalPrice: totalPrice,
-    date: date,
-    ETA: ETA,
+    date: date.toLocaleString(),
+    ETA: ETA.toLocaleString(),
     items: order,
   };
   usersDB.update(
@@ -81,7 +84,7 @@ async function checkUserId(req, res, next) {
   if (user) {
     next();
   } else {
-    res.status(401).send({ message: "User not logged in" });
+    res.status(401).send({ message: "No user with given user id" });
   }
 }
 
