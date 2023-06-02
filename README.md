@@ -11,10 +11,10 @@ Detta behövs till alla requests:
 {"username": "", "password": ""}
 
 ### /order
-{"username": "", "order": [{"id": "", "price": number, "title": ""}]}
+{"username": "", "order": [{"_id": "", "price": number, "title": ""}]}
 
 ### /user/history
-{"id": ""}
+{"userId": ""}
 
 ### /order/status/:orderNr
 
