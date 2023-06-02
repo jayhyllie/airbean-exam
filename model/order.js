@@ -37,7 +37,7 @@ async function checkOrders(req, res, next) {
   const products = await getProducts();
   const order = req.body.order;
   order.forEach((order) => {
-    const id = order.id;
+    const id = order._id;
     const price = order.price;
     const title = order.title;
     const product = products.find((product) => product._id === id);
