@@ -11,10 +11,10 @@ async function updateOrderStatus(orderNr) {
   const currentDate = new Date();
   const isDelivered = ETAdate < currentDate;
   let status = "";
-  if(isDelivered) {
-    status = "Done"
+  if (isDelivered) {
+    status = "Delivered";
   } else {
-    status = "Not done"
+    status = "Not delivered";
   }
   ordersDB.update(
     { "order.orderNr": orderNr },
@@ -36,7 +36,11 @@ async function checkOrders(req, res, next) {
     const price = order.price;
     const title = order.title;
     const product = products.find((product) => product._id === id);
-    if (!product || product.product.price !== price || product.product.title !== title) {
+    if (
+      !product ||
+      product.product.price !== price ||
+      product.product.title !== title
+    ) {
       res.status(400).send({ success: false, message: "Product not found" });
     } else {
       orderList.push(order);

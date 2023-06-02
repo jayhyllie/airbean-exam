@@ -1,19 +1,18 @@
-const nedb = require('nedb-promise');
+const nedb = require("nedb-promise");
 const productsDB = new nedb({ filename: "products.db", autoload: true });
-const menu = require("../menu.json");
+const menu = require("../utils/menu.json");
 const products = menu.menu;
-
 
 function importProducts() {
   products.forEach((product) => {
-    productsDB.insert({product: product});
+    productsDB.insert({ product: product });
   });
 }
 
 /* importProducts(); */
 
 async function getProducts() {
-    return await productsDB.find({});
+  return await productsDB.find({});
 }
 
-module.exports = { importProducts, getProducts }
+module.exports = { importProducts, getProducts };

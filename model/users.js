@@ -1,6 +1,6 @@
 const nedb = require("nedb-promise");
 const usersDB = new nedb({ filename: "users.db", autoload: true });
-const { comparePW } = require("../bcrypt");
+const { comparePW } = require("../utils/bcrypt");
 
 function addUser(username, password) {
   usersDB.insert({ username: username, password: password });
@@ -51,7 +51,7 @@ async function checkUserId(req, res, next) {
 
 async function isLoggedIn(username) {
   const user = await usersDB.findOne({ username: username });
-  if(user) {
+  if (user) {
     if (user.isLoggedIn) {
       return true;
     } else {
@@ -60,7 +60,15 @@ async function isLoggedIn(username) {
   }
 }
 
-function updateOrderHistory(username, order, date, ETA, orderNr, orderStatus, totalPrice) {
+function updateOrderHistory(
+  username,
+  order,
+  date,
+  ETA,
+  orderNr,
+  orderStatus,
+  totalPrice
+) {
   orderObj = {
     orderNr: orderNr,
     totalPrice: totalPrice,
