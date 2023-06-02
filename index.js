@@ -71,7 +71,7 @@ app.post("/api/order", checkOrders, async (req, res) => {
   const ETA = new Date(date.getTime());
   ETA.setMinutes(ETA.getMinutes() + 20);
 
-  const orderStatus = "Not delivered";
+  const orderStatus = false;
 
   // A random ordernr will be generated
   const orderNr = Math.floor(Math.random() * 1000);
