@@ -1,4 +1,5 @@
 const express = require("express");
+
 const { getProducts } = require("./model/products");
 const {
   addUser,
@@ -17,9 +18,11 @@ const {
   checkOrderNr,
 } = require("./model/order");
 const { hashPW } = require("./utils/bcrypt");
+
 const app = express();
-app.use(express.json());
 const PORT = 9090;
+
+app.use(express.json());
 
 // Get products from database
 app.get("/api/menu", async (req, res) => {
@@ -68,23 +71,15 @@ app.post("/api/order", checkOrders, async (req, res) => {
   const ETA = new Date(date.getTime());
   ETA.setMinutes(ETA.getMinutes() + 20);
 
-  const loggedIn = await isLoggedIn(username);
   const orderStatus = "Not delivered";
 
   // A random ordernr will be generated
   const orderNr = Math.floor(Math.random() * 1000);
 
+  const loggedIn = await isLoggedIn(username);
   if (loggedIn) {
     // Storing the order to the users order history
-    updateOrderHistory(
-      username,
-      order,
-      date,
-      ETA,
-      orderNr,
-      orderStatus,
-      totalPrice
-    );
+    updateOrderHistory(username, order, date, ETA, orderNr, totalPrice);
   }
 
   // Storing all orders, both for guests and users, in the orders database
@@ -104,7 +99,6 @@ app.post("/api/order", checkOrders, async (req, res) => {
 app.get("/api/user/history", checkUserId, async (req, res) => {
   const { userId } = req.body;
 
-  //When getting the order history the status of all orders will be updated.
   const userHistory = await getHistory(userId);
   if (userHistory) {
     res.send({
