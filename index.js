@@ -39,7 +39,7 @@ app.get("/api/menu", async (req, res) => {
   }
 });
 
-// Sign up with a middleware that check if there already exists a user with that username
+// Sign up with a middleware that check if username already exists
 // Password will be hashed
 app.post("/api/user/signup", checkUsername, async (req, res) => {
   const { username, password } = req.body;
@@ -48,7 +48,7 @@ app.post("/api/user/signup", checkUsername, async (req, res) => {
   res.send({ success: true, message: "User was added" });
 });
 
-// Login with middleware that first check if the username exists and the if the password is correct
+// Login with middleware that first check if the username exists and if the password is correct
 app.post("/api/user/login", findUser, authenticate, async (req, res) => {
   res.send({ success: true, message: "You are now logged in" });
 });
@@ -116,7 +116,7 @@ app.get("/api/user/history", checkUserId, async (req, res) => {
 app.get("/api/order/status/:orderNr", checkOrderNr, async (req, res) => {
   const orderNr = parseInt(req.params.orderNr, 10);
 
-  //When getting the order the order status will also be updated.
+  // When getting the order the order status will also be updated.
   const order = await getOrder(orderNr);
   const orderStatus = order.order.status;
   const ETA = order.order.ETA;

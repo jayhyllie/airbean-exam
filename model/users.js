@@ -10,7 +10,7 @@ function addUser(username, password) {
   usersDB.insert({ username: username, password: password });
 }
 
-// Middleware that checks if the given username already exists when trying to add a new user.
+// Middleware that checks if the username already exists on signup.
 async function checkUsername(req, res, next) {
   const { username } = req.body;
   const user = await usersDB.findOne({ username: username });
@@ -21,7 +21,7 @@ async function checkUsername(req, res, next) {
   }
 }
 
-// Middleware that checks if the given username is correct when trying to login.
+// Middleware that checks if the username is correct at login.
 async function findUser(req, res, next) {
   const { username } = req.body;
   const user = await usersDB.findOne({ username: username });
@@ -33,7 +33,7 @@ async function findUser(req, res, next) {
 }
 
 // Middleware that checks if the given password is correct.
-// If yes then the user will be logged in and a new property will be added.
+// If yes, user will be logged in and a new property will be added.
 async function authenticate(req, res, next) {
   const { username, password } = req.body;
   const user = await usersDB.findOne({ username: username });

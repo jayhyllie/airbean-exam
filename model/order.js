@@ -2,7 +2,7 @@ const nedb = require("nedb-promise");
 
 const { getProducts } = require("./products");
 
-// Creates and order database.
+// Creates the order database.
 const ordersDB = new nedb({ filename: "orders.db", autoload: true });
 
 // This function will update the order status when a status request of a certain order is made.
